@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Neonverse</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Audiowide&family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-red: #ff4757;
+            --neon-green: #00ff96;
+            --neon-blue: #00e5ff;
+            --neon-purple: #9c27b0;
+            --x: 0px;
+            --y: 0px;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'VT323', monospace;
+            color: var(--neon-green);
+            background-color: #000;
+            overflow-x: hidden;
+            cursor: none;
+            height: 100vh;
+            perspective: 1000px;
+        }
+        
+        /* Background with parallax effect */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.pexels.com/photos/355887/pexels-photo-355887.jpeg') center/cover no-repeat;
+            z-index: -2;
+            transform: translate3d(var(--x), var(--y), 0);
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+        
+        /* Digital rain effect */
+        .digital-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        /* Custom cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--neon-red);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s, width 0.3s, height 0.3s;
+            mix-blend-mode: difference;
+        }
+        
+        .cursor.active {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 71, 87, 0.2);
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            z-index: 100;
+        }
+        
+        .nav-container {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-item {
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-item:hover {
+            color: var(--neon-red);
+            text-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red);
+        }
+        
+        .nav-item.active {
+            color: var(--neon-red);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { text-shadow: 0 0 5px var(--neon-red); }
+            50% { text-shadow: 0 0 20px var(--neon-red); }
+            100% { text-shadow: 0 0 5px var(--neon-red); }
+        }
+        
+        /* Main content sections */
+        section {
+            display: none;
+            min-height: 100vh;
+            padding: 6rem 2rem 2rem;
+        }
+        
+        section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Anime cards grid */
+        .anime-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .anime-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--neon-blue);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .anime-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+        
+        .anime-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .anime-card-content {
+            padding: 1rem;
+        }
+        
+        .anime-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-red);
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .anime-card p {
+            margin: 0.5rem 0;
+        }
+        
+        .btn {
+            background: transparent;
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+        
+        .btn:hover {
+            background: var(--neon-green);
+            color: black;
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+        
+        /* Show more button */
+        .show-more {
+            display: block;
+            margin: 2rem auto;
+            padding: 0.8rem 2rem;
+            font-size: 1.3rem;
+        }
+        
+        /* Logo section */
+        .logo-section {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo-container {
+            display: inline-block;
+            border: 2px solid var(--neon-purple);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-container img {
+            max-width: 200px;
+            height: auto;
+        }
+        
+        /* Madara Mode styles */
+        body.madara-mode {
+            --neon-red: #ff0000;
+            --neon-green: #ff0000;
+            --neon-blue: #ff0000;
+        }
+        
+        body.madara-mode .background {
+            background: url('https://images.pexels.com/photos/355887/pexels-photo-355887.jpeg') center/cover no-repeat;
+            filter: hue-rotate(300deg) brightness(0.7);
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .nav-container {
+                gap: 1rem;
+                padding: 0.5rem;
+            }
+            
+            .nav-item {
+                font-size: 1.2rem;
+            }
+            
+            .anime-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background elements -->
+    <div class="background"></div>
+    <div class="overlay"></div>
+    <div class="digital-rain"></div>
+    <div class="cursor"></div>
+    
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="nav-item active" data-section="home">
+                <i class="fas fa-home"></i>
+            </div>
+            <div class="nav-item" data-section="about">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <div class="nav-item" data-section="donate">
+                <i class="fas fa-heart"></i>
+            </div>
+            <div class="nav-item" data-section="get">
+                <i class="fas fa-download"></i>
+            </div>
+            <div class="nav-item" data-section="search">
+                <i class="fas fa-search"></i>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main content sections -->
+    <section id="home" class="active">
+        <h1 class="neon-text">Infinite Neonverse</h1>
+        <p>Your portal to the ultimate anime experience</p>
+        
+        <div class="anime-grid">
+            <!-- Anime cards will be inserted here by JavaScript -->
+        </div>
+        
+        <button class="btn show-more">Show More</button>
+        
+        <div class="logo-section">
+            <div class="logo-container">
+                <img src="https://via.placeholder.com/200x100?text=Anime+Logo" alt="Anime Logo">
+            </div>
+            <button class="btn">
+                <i class="fas fa-download"></i> Get Logo
+            </button>
+        </div>
+    </section>
+    
+    <section id="about">
+        <h1 class="neon-text">About Infinite Neonverse</h1>
+        <p>Welcome to the digital ninja metaverse where anime comes to life.</p>
+        <p>This portal is inspired by the legendary Madara Uchiha and the infinite possibilities of the neon hacker world.</p>
+    </section>
+    
+    <section id="donate">
+        <h1 class="neon-text">Support the Neonverse</h1>
+        <p>Help us keep this portal alive and expanding.</p>
+    </section>
+    
+    <section id="get">
+        <h1 class="neon-text">Get the Latest</h1>
+        <p>Download the newest episodes and exclusive content.</p>
+    </section>
+    
+    <section id="search">
+        <h1 class="neon-text">Search the Neonverse</h1>
+        <div class="search-container">
+            <input type="text" placeholder="Search anime..." class="search-input">
+        </div>
+    </section>
+    
+    <script>
+        // Initialize cursor
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            // Parallax effect
+            document.documentElement.style.setProperty('--x', (e.clientX/window.innerWidth - 0.5) * 20 + 'px');
+            document.documentElement.style.setProperty('--y', (e.clientY/window.innerHeight - 0.5) * 20 + 'px');
+        });
+        
+        // Cursor hover effects
+        document.querySelectorAll('button, .nav-item, a').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.classList.add('active');
+            });
+            el.addEventListener('mouseleave', () => {
+                cursor.classList.remove('active');
+            });
+        });
+        
+        // Navigation
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('section');
+        
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all nav items
+                navItems.forEach(navItem => navItem.classList.remove('active'));
+                // Add active class to clicked item
+                item.classList.add('active');
+                
+                // Hide all sections
+                sections.forEach(section => section.classList.remove('active'));
+                // Show selected section
+                const sectionId = item.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+        
+        // Anime data
+        const animeList = [
+            {
+                title: "Black Clover",
+                episodes: 170,
+                rating: 8.3,
+                about: "Asta and Yuno embark on a magical journey to become the Wizard King.",
+                img: "https://images.pexels.com/photos/355887/pexels-photo-355887.jpeg"
+            },
+            {
+                title: "Naruto Shippuden",
+                episodes: 500,
+                rating: 8.7,
+                about: "Naruto Uzumaki's quest to become Hokage and protect his village.",
+                img: "https://images.pexels.com/photos/355887/pexels-photo-355887.jpeg"
+            },
+            {
+                title: "Demon Slayer",
+                episodes: 26,
+                rating: 8.9,
+                about: "Tanjiro Kamado's journey to turn his demon sister back into a human.",
+                img: "https://images.pexels.com/photos/355887/pexels-photo-355887.jpeg"
+            },
+            {
+                title: "Attack on Titan",
+                episodes: 75,
+                rating: 9.0,
+                about: "Humanity's struggle against man-eating Titans.",
+                img: "https://images.pexels.com/photos/355887/pexels-photo-355887.jpeg"
+            },
+            {
+                title: "Jujutsu Kaisen",
+                episodes: 24,
+                rating: 8.8,
+                about: "Yuji Itadori's battle against cursed spirits.",
+                img: "https://images.pexels.com/photos/355887/pexels-photo-355887.jpeg"
+            },
+            {
+                title: "My Hero Academia",
+                episodes: 113,
+                rating: 8.4,
+                about: "Izuku Midoriya's journey to become the greatest hero.",
+                img: "https://images.pexels.com/photos/355887/pexels-photo-355887.jpeg"
+            }
+        ];
+        
+        // Render anime cards
+        const animeGrid = document.querySelector('.anime-grid');
+        let visibleCards = 3;
+        
+        function renderAnimeCards() {
+            animeGrid.innerHTML = '';
+            for (let i = 0; i < Math.min(visibleCards, animeList.length); i++) {
+                const anime = animeList[i];
+                animeGrid.innerHTML += `
+                    <div class="anime-card">
+                        <img src="${anime.img}" alt="${anime.title}">
+                        <div class="anime-card-content">
+                            <h3>${anime.title}</h3>
+                            <p>Episodes: ${anime.episodes}</p>
+                            <p>Rating: ${anime.rating}/10</p>
+                            <p>${anime.about}</p>
+                            <button class="btn">Get All Episodes</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initial render
+        renderAnimeCards();
+        
+        // Show more button
+        document.querySelector('.show-more').addEventListener('click', () => {
+            visibleCards += 3;
+            if (visibleCards >= animeList.length) {
+                document.querySelector('.show-more').style.display = 'none';
+            }
+            renderAnimeCards();
+        });
+        
+        // Madara Mode (Konami code)
+        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 
+                           'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 
+                           'KeyB', 'KeyA'];
+        let konamiIndex = 0;
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.code === konamiCode[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konamiCode.length) {
+                    document.body.classList.toggle('madara-mode');
+                    konamiIndex = 0;
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        });
+        
+        // Digital rain effect
+        function createDigitalRain() {
+            const digitalRain = document.querySelector('.digital-rain');
+            const columns = Math.floor(window.innerWidth / 20);
+            
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.style.position = 'absolute';
+                column.style.top = '-50px';
+                column.style.left = (i * 20) + 'px';
+                column.style.width = '2px';
+                column.style.height = Math.random() * 50 + 50 + 'px';
+                column.style.background = 'linear-gradient(to bottom, transparent, var(--neon-green))';
+                column.style.animation = `rain ${Math.random() * 1 + 1}s linear infinite`;
+                column.style.animationDelay = Math.random() * 2 + 's';
+                digitalRain.appendChild(column);
+            }
+        }
+        
+        // Create digital rain columns
+        createDigitalRain();
+        
+        // Add rain animation
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes rain {
+                to {
+                    transform: translateY(100vh);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
